@@ -6,9 +6,10 @@ use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
 use winapi::ctypes::wchar_t;
 use winapi::shared::minwindef::{BOOL, FALSE};
-use winapi::shared::winerror::S_OK;
+use winapi::shared::winerror::{E_FAIL, S_OK};
 use winapi::um::dwrite::IDWriteLocalizedStrings;
 use winapi::um::winnls::GetUserDefaultLocaleName;
+use winapi::um::winnt::HRESULT;
 use wio::com::ComPtr;
 
 lazy_static! {
@@ -22,7 +23,7 @@ lazy_static! {
     static ref EN_US_LOCALE: Vec<wchar_t> = OsStr::new("en-us").to_wide_null();
 }
 
-pub fn get_locale_string(strings: &mut ComPtr<IDWriteLocalizedStrings>) -> String {
+pub fn get_locale_string(strings: &mut ComPtr<IDWriteLocalizedStrings>) -> Result<String, HRESULT> {
     unsafe {
         let mut index: u32 = 0;
         let mut exists: BOOL = FALSE;
@@ -37,14 +38,18 @@ pub fn get_locale_string(strings: &mut ComPtr<IDWriteLocalizedStrings>) -> Strin
 
         let mut length: u32 = 0;
         let hr = strings.GetStringLength(index, &mut length);
-        assert!(hr == 0);
+        if hr != S_OK {
+            return Err(hr);
+        }
 
         let mut name: Vec<wchar_t> = Vec::with_capacity(length as usize + 1);
         let hr = strings.GetString(index, name.as_mut_ptr(), length + 1);
-        assert!(hr == 0);
+        if hr != S_OK {
+            return Err(hr);
+        }
         name.set_len(length as usize);
 
-        String::from_utf16(&name).ok().unwrap()
+        String::from_utf16(&name).map_err(|_| E_FAIL)
     }
 }
 
