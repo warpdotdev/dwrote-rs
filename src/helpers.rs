@@ -23,12 +23,7 @@ lazy_static! {
     static ref EN_US_LOCALE: Vec<wchar_t> = OsStr::new("en-us").to_wide_null();
 }
 
-#[deprecated(note = "Use `locale_string` instead.")]
-pub fn get_locale_string(strings: &mut ComPtr<IDWriteLocalizedStrings>) -> String {
-    locale_string(strings).unwrap()
-}
-
-pub fn locale_string(strings: &mut ComPtr<IDWriteLocalizedStrings>) -> Result<String, HRESULT> {
+pub fn get_locale_string(strings: &mut ComPtr<IDWriteLocalizedStrings>) -> Result<String, HRESULT> {
     unsafe {
         let mut index: u32 = 0;
         let mut exists: BOOL = FALSE;
