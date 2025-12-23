@@ -57,7 +57,7 @@ impl Font {
 
     pub fn to_descriptor(&self) -> FontDescriptor {
         FontDescriptor {
-            family_name: self.get_family_name(),
+            family_name: self.family_name().unwrap_or_default(),
             stretch: self.stretch(),
             style: self.style(),
             weight: self.weight(),
@@ -117,7 +117,7 @@ impl Font {
                 return Err(hr);
             }
 
-            locale_string(&mut ComPtr::from_raw(names))
+            get_locale_string(&mut ComPtr::from_raw(names))
         }
     }
 
@@ -139,7 +139,7 @@ impl Font {
                 return Err(hr);
             }
             if exists == TRUE {
-                Ok(Some(locale_string(&mut ComPtr::from_raw(names))?))
+                Ok(Some(get_locale_string(&mut ComPtr::from_raw(names))?))
             } else {
                 Ok(None)
             }
