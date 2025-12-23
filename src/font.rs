@@ -117,7 +117,7 @@ impl Font {
                 return Err(hr);
             }
 
-            Ok(get_locale_string(&mut ComPtr::from_raw(names)))
+            locale_string(&mut ComPtr::from_raw(names))
         }
     }
 
@@ -139,7 +139,7 @@ impl Font {
                 return Err(hr);
             }
             if exists == TRUE {
-                Ok(Some(get_locale_string(&mut ComPtr::from_raw(names))))
+                Ok(Some(locale_string(&mut ComPtr::from_raw(names))?))
             } else {
                 Ok(None)
             }
